@@ -53,6 +53,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         .logo {
@@ -790,6 +791,67 @@
         .backup-file-input {
             margin: 1rem 0;
         }
+        
+        /* Новые стили для поиска */
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            width: 100%;
+        }
+        
+        .search-box {
+            display: flex;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .search-box .form-control {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .search-box .btn {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        
+        .download-by-id {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 500px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        
+        .download-by-id h4 {
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+        
+        .download-by-id-form {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .search-results-title {
+            color: white;
+            margin: 2rem 0 1rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .no-results {
+            color: #aaa;
+            text-align: center;
+            padding: 20px;
+            grid-column: 1 / -1;
+        }
     </style>
 </head>
 <body>
@@ -820,6 +882,16 @@
     </header>
     
     <main class="container">
+        <!-- Поиск модов -->
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="search-input" class="form-control" placeholder="Поиск модов по названию, описанию или ID...">
+                <button class="btn btn-primary" id="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+        
         <!-- Вкладка с модами -->
         <div id="mods-tab" class="tab-content active">
             <h1 class="section-title"><i class="fas fa-box-open"></i> Каталог модов</h1>
@@ -833,6 +905,12 @@
             <h2 class="mods-section-title"><i class="fas fa-users"></i> Моды сообщества</h2>
             <div class="mods-grid" id="community-mods">
                 <!-- Моды сообщества будут загружаться из JavaScript -->
+            </div>
+            
+            <!-- Результаты поиска -->
+            <div id="search-results" style="display: none;">
+                <h2 class="search-results-title"><i class="fas fa-search"></i> Результаты поиска</h2>
+                <div class="mods-grid" id="search-results-grid"></div>
             </div>
         </div>
         
@@ -1052,6 +1130,15 @@
 
     <div class="footer">
         <div class="container">
+            <div class="download-by-id">
+                <h4><i class="fas fa-download"></i> Скачать мод по ID</h4>
+                <form id="download-by-id-form" class="download-by-id-form">
+                    <input type="number" id="mod-id-input" class="form-control" placeholder="Введите ID мода" min="1" required>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-download"></i> Скачать
+                    </button>
+                </form>
+            </div>
             <p>Luckerducker Mods &copy; 2023 | Все права защищены</p>
         </div>
     </div>
@@ -1085,6 +1172,10 @@
         const restoreBtn = document.getElementById('restore-btn');
         const backupFile = document.getElementById('backup-file');
         const mainLogo = document.getElementById('main-logo');
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const downloadByIdForm = document.getElementById('download-by-id-form');
+        const modIdInput = document.getElementById('mod-id-input');
         
         // Статистические элементы
         const totalUsersEl = document.getElementById('total-users');
@@ -1399,6 +1490,78 @@
             reader.readAsText(file);
         });
         
+        // Поиск модов
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') performSearch();
+        });
+        
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            if (!searchTerm) {
+                // Если строка поиска пустая, показываем все моды
+                document.getElementById('official-mods').style.display = 'grid';
+                document.getElementById('community-mods').style.display = 'grid';
+                document.getElementById('search-results').style.display = 'none';
+                document.querySelectorAll('.mods-section-title').forEach(el => el.style.display = 'flex');
+                return;
+            }
+            
+            // Скрываем обычные разделы
+            document.getElementById('official-mods').style.display = 'none';
+            document.getElementById('community-mods').style.display = 'none';
+            document.querySelectorAll('.mods-section-title').forEach(el => el.style.display = 'none');
+            
+            // Показываем результаты поиска
+            const searchResults = document.getElementById('search-results');
+            const searchResultsGrid = document.getElementById('search-results-grid');
+            searchResults.style.display = 'block';
+            searchResultsGrid.innerHTML = '';
+            
+            // Ищем моды по названию, описанию и ID
+            const filteredMods = modsDatabase.filter(mod => 
+                mod.name.toLowerCase().includes(searchTerm) || 
+                mod.description.toLowerCase().includes(searchTerm) ||
+                mod.id.toString().includes(searchTerm)
+            );
+            
+            if (filteredMods.length > 0) {
+                filteredMods.forEach(mod => {
+                    searchResultsGrid.innerHTML += renderModCard(mod);
+                });
+            } else {
+                searchResultsGrid.innerHTML = '<div class="no-results"><i class="fas fa-search"></i> Ничего не найдено</div>';
+            }
+            
+            // Назначаем обработчики для новых карточек
+            assignModCardHandlers();
+        }
+        
+        // Скачивание по ID
+        downloadByIdForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const modId = parseInt(modIdInput.value);
+            if (!modId) {
+                alert('Введите ID мода');
+                return;
+            }
+            
+            const mod = modsDatabase.find(m => m.id === modId);
+            if (!mod) {
+                alert('Мод с таким ID не найден');
+                return;
+            }
+            
+            if (mod.status !== 'approved' && (!currentUser || !currentUser.isAdmin)) {
+                alert('Этот мод еще не одобрен и недоступен для скачивания');
+                return;
+            }
+            
+            downloadMod(modId);
+            modIdInput.value = '';
+            alert(`Начинается загрузка мода: ${mod.name}`);
+        });
+        
         // Обновление интерфейса в зависимости от авторизации
         function updateUI() {
             if (currentUser) {
@@ -1441,6 +1604,15 @@
             // Обновляем статистику на админ-панели
             if (tabId === 'admin-tab') {
                 updateStats();
+            }
+            
+            // При переключении на вкладку модов показываем все моды
+            if (tabId === 'mods-tab') {
+                document.getElementById('official-mods').style.display = 'grid';
+                document.getElementById('community-mods').style.display = 'grid';
+                document.getElementById('search-results').style.display = 'none';
+                document.querySelectorAll('.mods-section-title').forEach(el => el.style.display = 'flex');
+                searchInput.value = '';
             }
         }
         
@@ -1718,6 +1890,12 @@
             });
             
             // Назначаем обработчики для кнопок
+            assignModCardHandlers();
+        }
+        
+        // Назначение обработчиков событий для карточек модов
+        function assignModCardHandlers() {
+            // Назначаем обработчики для кнопок одобрения/отклонения
             document.querySelectorAll('.approve-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const modId = parseInt(this.closest('.mod-card').getAttribute('data-id'));
@@ -1738,6 +1916,7 @@
                 });
             });
             
+            // Назначаем обработчики для скачивания
             document.querySelectorAll('.download-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -1747,6 +1926,7 @@
                 });
             });
             
+            // Назначаем обработчики для удаления мода
             document.querySelectorAll('.delete-mod').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
