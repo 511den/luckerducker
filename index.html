@@ -852,6 +852,29 @@
             padding: 20px;
             grid-column: 1 / -1;
         }
+
+        /* Новые стили для ID мода */
+        .mod-id {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Стили для скачивания модов на проверке */
+        .pending-download {
+            background-color: var(--warning) !important;
+            color: var(--dark) !important;
+        }
+
+        .pending-download:hover {
+            background-color: #e1b12c !important;
+        }
     </style>
 </head>
 <body>
@@ -1144,8 +1167,8 @@
     </div>
 
     <script>
-        // Конфиденциальный админ-код
-        const ADMIN_CODE = "511developermodeon";
+        // Конфиденциальный админ-код (скрыт в реальном приложении)
+        const ADMIN_CODE = "********";
         
         // Текущий пользователь
         let currentUser = null;
@@ -1499,7 +1522,6 @@
         function performSearch() {
             const searchTerm = searchInput.value.toLowerCase().trim();
             if (!searchTerm) {
-                // Если строка поиска пустая, показываем все моды
                 document.getElementById('official-mods').style.display = 'grid';
                 document.getElementById('community-mods').style.display = 'grid';
                 document.getElementById('search-results').style.display = 'none';
@@ -1507,22 +1529,26 @@
                 return;
             }
             
-            // Скрываем обычные разделы
+            // Исключаем поиск по админ-коду
+            if (searchTerm === ADMIN_CODE.toLowerCase()) {
+                alert('Поиск по этому запросу невозможен');
+                return;
+            }
+            
             document.getElementById('official-mods').style.display = 'none';
             document.getElementById('community-mods').style.display = 'none';
             document.querySelectorAll('.mods-section-title').forEach(el => el.style.display = 'none');
             
-            // Показываем результаты поиска
             const searchResults = document.getElementById('search-results');
             const searchResultsGrid = document.getElementById('search-results-grid');
             searchResults.style.display = 'block';
             searchResultsGrid.innerHTML = '';
             
-            // Ищем моды по названию, описанию и ID
             const filteredMods = modsDatabase.filter(mod => 
-                mod.name.toLowerCase().includes(searchTerm) || 
+                (mod.name.toLowerCase().includes(searchTerm) || 
                 mod.description.toLowerCase().includes(searchTerm) ||
-                mod.id.toString().includes(searchTerm)
+                mod.id.toString().includes(searchTerm)) &&
+                (mod.status === 'approved' || (currentUser && (currentUser.id === mod.userId || currentUser.isAdmin)))
             );
             
             if (filteredMods.length > 0) {
@@ -1533,7 +1559,6 @@
                 searchResultsGrid.innerHTML = '<div class="no-results"><i class="fas fa-search"></i> Ничего не найдено</div>';
             }
             
-            // Назначаем обработчики для новых карточек
             assignModCardHandlers();
         }
         
@@ -1552,8 +1577,11 @@
                 return;
             }
             
-            if (mod.status !== 'approved' && (!currentUser || !currentUser.isAdmin)) {
-                alert('Этот мод еще не одобрен и недоступен для скачивания');
+            // Разрешаем скачивание:
+            // - Одобренных модов всем
+            // - Модов на проверке только владельцу или админу
+            if (mod.status !== 'approved' && (!currentUser || (currentUser.id !== mod.userId && !currentUser.isAdmin))) {
+                alert('Этот мод еще не одобрен. Скачивание доступно только автору мода или администратору.');
                 return;
             }
             
@@ -1773,7 +1801,11 @@
                 link.click();
                 document.body.removeChild(link);
                 
-                alert(`Начинается загрузка: ${mod.filename}`);
+                // Обновляем интерфейс, если мод на странице
+                if (document.querySelector(`.mod-card[data-id="${id}"] .download-btn`)) {
+                    document.querySelector(`.mod-card[data-id="${id}"] .download-btn`).innerHTML = 
+                        `<i class="fas fa-download"></i> Скачать (${mod.downloads})${mod.status !== 'approved' ? ' [На проверке]' : ''}`;
+                }
             }
         }
         
@@ -1831,8 +1863,25 @@
                 `<span class="mod-badge badge-official"><i class="fas fa-crown"></i> Официальный</span>` : 
                 `<span class="mod-badge badge-community"><i class="fas fa-users"></i> Сообщество</span>`;
             
+            // Добавляем кнопку скачивания для модов на проверке (только для владельца и админа)
+            let downloadButton = '';
+            if (mod.status === 'approved') {
+                downloadButton = `
+                    <a href="#" class="btn btn-primary download-btn" data-id="${mod.id}" style="margin-top: 10px; display: inline-block;">
+                        <i class="fas fa-download"></i> Скачать (${mod.downloads})
+                    </a>
+                `;
+            } else if (currentUser && (currentUser.id === mod.userId || currentUser.isAdmin)) {
+                downloadButton = `
+                    <a href="#" class="btn pending-download download-btn" data-id="${mod.id}" style="margin-top: 10px; display: inline-block;">
+                        <i class="fas fa-download"></i> Скачать (${mod.downloads}) [На проверке]
+                    </a>
+                `;
+            }
+
             return `
                 <div class="mod-card" data-id="${mod.id}">
+                    <div class="mod-id">ID: ${mod.id}</div>
                     ${isOwner ? `<button class="delete-mod" title="Удалить мод"><i class="fas fa-trash"></i></button>` : ''}
                     <div class="mod-preview">
                         <i class="fas fa-${mod.status === 'approved' ? 'check' : 'clock'}"></i>
@@ -1848,20 +1897,16 @@
                             </span>
                             <span><i class="fas fa-calendar-alt"></i> ${mod.date}</span>
                         </div>
-                        ${mod.status === 'approved' ? 
-                            `<a href="#" class="btn btn-primary download-btn" data-id="${mod.id}" style="margin-top: 10px; display: inline-block;">
-                                <i class="fas fa-download"></i> Скачать (${mod.downloads})
-                            </a>` : 
-                            currentUser && currentUser.isAdmin ? `
-                            <div class="admin-actions">
-                                <button class="btn btn-success approve-btn">
-                                    <i class="fas fa-check"></i> Одобрить
-                                </button>
-                                <button class="btn btn-danger reject-btn">
-                                    <i class="fas fa-times"></i> Отклонить
-                                </button>
-                            </div>` : ''
-                        }
+                        ${downloadButton}
+                        ${mod.status !== 'approved' && currentUser && currentUser.isAdmin ? `
+                        <div class="admin-actions">
+                            <button class="btn btn-success approve-btn">
+                                <i class="fas fa-check"></i> Одобрить
+                            </button>
+                            <button class="btn btn-danger reject-btn">
+                                <i class="fas fa-times"></i> Отклонить
+                            </button>
+                        </div>` : ''}
                     </div>
                 </div>
             `;
@@ -2006,7 +2051,7 @@
             
             const modPage = document.getElementById('mod-page-tab');
             modPage.innerHTML = `
-                <h1 class="section-title">${mod.name}</h1>
+                <h1 class="section-title">${mod.name} <small style="font-size: 0.6em; color: #a29bfe;">ID: ${mod.id}</small></h1>
                 
                 <div class="mod-header">
                     <div class="mod-header-image">
@@ -2034,6 +2079,12 @@
                         <button class="btn btn-primary download-btn" data-id="${mod.id}">
                             <i class="fas fa-download"></i> Скачать
                         </button>
+                        
+                        ${mod.status !== 'approved' && currentUser && (currentUser.id === mod.userId || currentUser.isAdmin) ? `
+                        <button class="btn btn-warning pending-download" id="pending-download-btn" data-id="${mod.id}">
+                            <i class="fas fa-download"></i> Скачать [На проверке]
+                        </button>
+                        ` : ''}
                         
                         <button class="btn ${mod.likedBy && mod.likedBy.includes(currentUser?.id) ? 'btn-danger' : 'btn-secondary'} like-btn" id="like-mod-btn" data-id="${mod.id}">
                             <i class="fas fa-heart"></i> ${mod.likedBy && mod.likedBy.includes(currentUser?.id) ? 'Убрать лайк' : 'Лайк'}
@@ -2074,6 +2125,12 @@
             
             // Назначаем обработчики для страницы мода
             document.querySelector('.download-btn')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                downloadMod(modId);
+                updateStats();
+            });
+            
+            document.getElementById('pending-download-btn')?.addEventListener('click', function(e) {
                 e.preventDefault();
                 downloadMod(modId);
                 updateStats();
