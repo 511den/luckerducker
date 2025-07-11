@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luckerducker Mods</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* === ОСНОВНЫЕ СТИЛИ === */
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --success: #00b894;
+            --danger: #d63031;
+            --warning: #fdcb6e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            background-size: cover;
+            min-height: 100vh;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
+        
+        nav ul li {
+            margin-left: 20px;
+            position: relative;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        nav ul li a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .auth-buttons .btn {
+            margin-left: 10px;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .mods-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .mod-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+        
+        .mod-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            border-color: var(--primary);
+        }
+        
+        .mod-preview {
+            height: 160px;
+            background: linear-gradient(45deg, rgba(108, 92, 231, 0.2), rgba(162, 155, 254, 0.2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 2.5rem;
+        }
+        
+        .mod-content {
+            padding: 1.2rem;
+        }
+        
+        .mod-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+        
+        .mod-author {
+            color: #a29bfe;
+            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .mod-description {
+            color: #ddd;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .mod-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+        
+        .mod-status {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: rgba(253, 203, 110, 0.2);
+            color: #fdcb6e;
+        }
+        
+        .status-approved {
+            background: rgba(0, 184, 148, 0.2);
+            color: #00b894;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            margin-right: 8px;
+        }
+        
+        .btn i {
+            margin-right: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #5649c0;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #009d7a;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c23616;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e1b12c;
+        }
+        
+        .upload-section {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 800px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .section-title {
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .section-subtitle {
+            color: #a29bfe;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: white;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            font-size: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.3);
+        }
+        
+        .file-upload {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            padding: 1.5rem;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+            color: #aaa;
+        }
+        
+        .file-upload:hover {
+            border-color: var(--primary);
+            background: rgba(108, 92, 231, 0.1);
+        }
+        
+        .admin-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+        
+        .delete-mod {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(214, 48, 49, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .mod-card:hover .delete-mod {
+            opacity: 1;
+        }
+        
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .auth-content {
+            background: linear-gradient(135deg, #1e1e2e, #2d2d44);
+            padding: 2.5rem;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(108, 92, 231, 0.3);
+            animation: modalAppear 0.5s ease;
+        }
+        
+        @keyframes modalAppear {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .auth-header h2 {
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            cursor: pointer;
+            background: transparent;
+            color: #aaa;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .auth-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .admin-code-info {
+            background: rgba(108, 92, 231, 0.1);
+            border-left: 3px solid var(--primary);
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+            color: #a29bfe;
+            font-size: 0.9rem;
+        }
+        
+        .admin-code-info i {
+            margin-right: 5px;
+        }
+        
+        .admin-code-field {
+            display: none;
+        }
+        
+        .admin-code-field.show {
+            display: block;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: #aaa;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .mods-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            nav ul li {
+                margin: 5px;
+            }
+            
+            .auth-buttons {
+                margin-top: 1rem;
+            }
+            
+            .auth-content {
+                padding: 1.5rem;
+            }
+        }
+        
+        /* === СТИЛИ АДМИН-ПАНЕЛИ === */
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #a29bfe;
+            font-size: 1rem;
+        }
+        
+        .admin-tools {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .tool-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tool-card h3 {
+            color: white;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .tool-card h3 i {
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+        
+        .tool-card p {
+            color: #ddd;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .user-table th, .user-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .user-table th {
+            background: rgba(108, 92, 231, 0.2);
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
+        .user-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .user-role {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .role-admin {
+            background: rgba(108, 92, 231, 0.2);
+            color: var(--primary);
+        }
+        
+        .role-user {
+            background: rgba(0, 184, 148, 0.2);
+            color: var(--success);
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+        
+        .mods-section-title {
+            color: white;
+            margin: 2rem 0 1rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .mods-section-title i {
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+        
+        .bulk-actions {
+            display: flex;
+            gap: 10px;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .mod-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        
+        .badge-official {
+            background: rgba(108, 92, 231, 0.2);
+            color: var(--primary);
+        }
+        
+        .badge-community {
+            background: rgba(0, 184, 148, 0.2);
+            color: var(--success);
+        }
+        
+        /* Стили для страницы мода */
+        .mod-page {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .mod-header {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            align-items: flex-start;
+        }
+        
+        .mod-header-image {
+            flex: 0 0 300px;
+            height: 200px;
+            background: linear-gradient(45deg, rgba(108, 92, 231, 0.2), rgba(162, 155, 254, 0.2));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--primary);
+        }
+        
+        .mod-header-info {
+            flex: 1;
+        }
+        
+        .mod-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .mod-stat {
+            text-align: center;
+        }
+        
+        .mod-stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .mod-stat-label {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        .comments-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .comment-form {
+            margin-bottom: 2rem;
+        }
+        
+        .comment {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .comment-author {
+            font-weight: bold;
+            color: var(--secondary);
+        }
+        
+        .comment-date {
+            color: #aaa;
+            font-size: 0.8rem;
+        }
+        
+        .comment-content {
+            color: #ddd;
+        }
+        
+        .like-btn {
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+        
+        .like-btn.liked {
+            color: var(--danger);
+        }
+        
+        /* Стили для профиля */
+        .profile-page {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+        
+        .profile-stats {
+            display: flex;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+        
+        .profile-stat {
+            text-align: center;
+        }
+        
+        .profile-stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .profile-stat-label {
+            color: #aaa;
+        }
+        
+        /* Стили для восстановления бэкапа */
+        .restore-section {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        .backup-file-input {
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo" id="main-logo">
+                    <i class="fas fa-puzzle-piece"></i>
+                    <span>Luckerducker Mods</span>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-tab="mods-tab"><i class="fas fa-th-list"></i> Моды</a></li>
+                        <li><a href="#" class="nav-link" data-tab="upload-tab"><i class="fas fa-upload"></i> Загрузить</a></li>
+                        <li><a href="#" class="nav-link" data-tab="admin-tab"><i class="fas fa-user-shield"></i> Админ</a></li>
+                        <li class="auth-buttons">
+                            <button id="login-btn" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Вход</button>
+                            <button id="register-btn" class="btn btn-warning"><i class="fas fa-user-plus"></i> Регистрация</button>
+                            <div id="user-profile" style="display: none;">
+                                <span id="username-display" style="color: white; margin-right: 10px; cursor: pointer;" data-tab="profile-tab"></span>
+                                <button id="logout-btn" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Выход</button>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <main class="container">
+        <!-- Вкладка с модами -->
+        <div id="mods-tab" class="tab-content active">
+            <h1 class="section-title"><i class="fas fa-box-open"></i> Каталог модов</h1>
+            <p class="section-subtitle">Официальные и пользовательские модификации</p>
+            
+            <h2 class="mods-section-title"><i class="fas fa-crown"></i> Официальные моды</h2>
+            <div class="mods-grid" id="official-mods">
+                <!-- Официальные моды будут загружаться из JavaScript -->
+            </div>
+            
+            <h2 class="mods-section-title"><i class="fas fa-users"></i> Моды сообщества</h2>
+            <div class="mods-grid" id="community-mods">
+                <!-- Моды сообщества будут загружаться из JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Вкладка загрузки -->
+        <div id="upload-tab" class="tab-content">
+            <h1 class="section-title"><i class="fas fa-upload"></i> Загрузить мод</h1>
+            <p class="section-subtitle">Поделитесь своим творением с сообществом</p>
+            
+            <div class="upload-section">
+                <form id="upload-form">
+                    <div class="form-group">
+                        <label for="mod-name">Название мода</label>
+                        <input type="text" id="mod-name" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mod-desc">Описание мода</label>
+                        <textarea id="mod-desc" class="form-control" rows="4" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Файл мода (.zip)</label>
+                        <div class="file-upload" id="file-upload-area">
+                            <i class="fas fa-file-archive" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <p>Перетащите файл сюда или кликните для выбора</p>
+                            <input type="file" id="mod-file" accept=".zip" style="display: none;" required>
+                        </div>
+                        <div id="file-name" style="font-size: 0.9rem; color: #aaa;"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">
+                        <i class="fas fa-cloud-upload-alt"></i> Отправить на модерацию
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Админ-панель -->
+        <div id="admin-tab" class="tab-content">
+            <h1 class="section-title"><i class="fas fa-user-shield"></i> Панель администратора</h1>
+            <p class="section-subtitle">Модерация контента и управление системой</p>
+            
+            <!-- Статистика -->
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-users">0</div>
+                    <div class="stat-label">Пользователей</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-mods">0</div>
+                    <div class="stat-label">Всего модов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="pending-mods-count">0</div>
+                    <div class="stat-label">На проверке</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="downloads-count">0</div>
+                    <div class="stat-label">Всего загрузок</div>
+                </div>
+            </div>
+            
+            <!-- Инструменты админа -->
+            <div class="admin-tools">
+                <div class="tool-card">
+                    <h3><i class="fas fa-users-cog"></i> Управление пользователями</h3>
+                    <p>Просмотр, редактирование и удаление пользователей системы</p>
+                    <button class="btn btn-primary" id="manage-users-btn">
+                        <i class="fas fa-users"></i> Управление
+                    </button>
+                </div>
+                <div class="tool-card">
+                    <h3><i class="fas fa-crown"></i> Официальные моды</h3>
+                    <p>Создание и управление официальными модификациями</p>
+                    <button class="btn btn-warning" id="official-mods-btn">
+                        <i class="fas fa-plus-circle"></i> Создать
+                    </button>
+                </div>
+                <div class="tool-card">
+                    <h3><i class="fas fa-chart-line"></i> Статистика</h3>
+                    <p>Аналитика использования и активности пользователей</p>
+                    <button class="btn btn-success" id="stats-btn">
+                        <i class="fas fa-chart-bar"></i> Просмотр
+                    </button>
+                </div>
+                <div class="tool-card">
+                    <h3><i class="fas fa-database"></i> Резервное копирование</h3>
+                    <p>Создание резервных копий и восстановление данных</p>
+                    <button class="btn btn-secondary" id="backup-btn">
+                        <i class="fas fa-save"></i> Создать бэкап
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Восстановление бэкапа -->
+            <div class="restore-section">
+                <h3><i class="fas fa-file-download"></i> Восстановление из резервной копии</h3>
+                <div class="form-group">
+                    <input type="file" id="backup-file" class="backup-file-input" accept=".json">
+                </div>
+                <button class="btn btn-primary" id="restore-btn">
+                    <i class="fas fa-file-import"></i> Восстановить данные
+                </button>
+            </div>
+            
+            <!-- Моды на проверке -->
+            <h2 class="mods-section-title"><i class="fas fa-clock"></i> Моды на проверке</h2>
+            <div class="bulk-actions">
+                <button class="btn btn-success" id="approve-all-btn">
+                    <i class="fas fa-check-double"></i> Одобрить все
+                </button>
+                <button class="btn btn-danger" id="reject-all-btn">
+                    <i class="fas fa-trash-alt"></i> Отклонить все
+                </button>
+            </div>
+            <div class="mods-grid" id="pending-mods">
+                <!-- Моды на проверке будут загружаться из JavaScript -->
+            </div>
+            
+            <!-- Управление пользователями -->
+            <div id="users-management" style="display: none; margin-top: 3rem;">
+                <h2 class="mods-section-title"><i class="fas fa-users-cog"></i> Управление пользователями</h2>
+                <div class="table-responsive">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Логин</th>
+                                <th>Email</th>
+                                <th>Роль</th>
+                                <th>Дата регистрации</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <!-- Пользователи будут загружаться из JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Страница мода -->
+        <div id="mod-page-tab" class="tab-content mod-page">
+            <!-- Контент будет загружаться динамически -->
+        </div>
+        
+        <!-- Страница профиля -->
+        <div id="profile-tab" class="tab-content profile-page">
+            <!-- Контент будет загружаться динамически -->
+        </div>
+    </main>
+
+    <!-- Модальное окно авторизации -->
+    <div id="auth-modal" class="auth-modal">
+        <div class="auth-content">
+            <div class="auth-header">
+                <h2><i class="fas fa-lock"></i> Авторизация</h2>
+                <p style="color: #aaa;">Войдите или зарегистрируйтесь</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">Вход</div>
+                <div class="auth-tab" data-tab="register">Регистрация</div>
+            </div>
+            
+            <form id="login-form" class="auth-form active">
+                <div class="form-group">
+                    <label for="login-username">Логин</label>
+                    <input type="text" id="login-username" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Пароль</label>
+                    <input type="password" id="login-password" class="form-control" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </button>
+            </form>
+            
+            <form id="register-form" class="auth-form">
+                <div class="form-group">
+                    <label for="register-username">Логин</label>
+                    <input type="text" id="register-username" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-password">Пароль</label>
+                    <input type="password" id="register-password" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" class="form-control" required>
+                </div>
+                
+                <div class="form-group admin-code-field" id="admin-code-group">
+                    <label for="admin-code">Код администратора</label>
+                    <input type="password" id="admin-code" class="form-control">
+                    <div class="admin-code-info">
+                        <i class="fas fa-info-circle"></i> Для получения прав администратора введите специальный код
+                    </div>
+                </div>
+                
+                <button type="button" class="btn btn-secondary" id="show-admin-code" style="width: 100%; margin-bottom: 15px; background: rgba(255,255,255,0.1); color: #aaa;">
+                    <i class="fas fa-key"></i> У меня есть код администратора
+                </button>
+                
+                <button type="submit" class="btn btn-warning" style="width: 100%; padding: 12px;">
+                    <i class="fas fa-user-plus"></i> Зарегистрироваться
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <p>Luckerducker Mods &copy; 2023 | Все права защищены</p>
+        </div>
+    </div>
+
+    <script>
+        // Конфиденциальный админ-код
+        const ADMIN_CODE = "511developermodeon";
+        
+        // Текущий пользователь
+        let currentUser = null;
+        
+        // DOM элементы
+        const authModal = document.getElementById('auth-modal');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const userProfile = document.getElementById('user-profile');
+        const usernameDisplay = document.getElementById('username-display');
+        const showAdminCodeBtn = document.getElementById('show-admin-code');
+        const adminCodeGroup = document.getElementById('admin-code-group');
+        const manageUsersBtn = document.getElementById('manage-users-btn');
+        const usersManagement = document.getElementById('users-management');
+        const usersTableBody = document.getElementById('users-table-body');
+        const approveAllBtn = document.getElementById('approve-all-btn');
+        const rejectAllBtn = document.getElementById('reject-all-btn');
+        const officialModsBtn = document.getElementById('official-mods-btn');
+        const statsBtn = document.getElementById('stats-btn');
+        const backupBtn = document.getElementById('backup-btn');
+        const restoreBtn = document.getElementById('restore-btn');
+        const backupFile = document.getElementById('backup-file');
+        const mainLogo = document.getElementById('main-logo');
+        
+        // Статистические элементы
+        const totalUsersEl = document.getElementById('total-users');
+        const totalModsEl = document.getElementById('total-mods');
+        const pendingModsCountEl = document.getElementById('pending-mods-count');
+        const downloadsCountEl = document.getElementById('downloads-count');
+
+        // Базы данных
+        let usersDatabase = JSON.parse(localStorage.getItem('users')) || [
+            {
+                id: 1,
+                username: "admin",
+                password: "admin123",
+                email: "admin@example.com",
+                isAdmin: true,
+                regDate: "01.07.2023",
+                modsCount: 2,
+                downloadsCount: 2137,
+                likesCount: 145
+            },
+            {
+                id: 2,
+                username: "user",
+                password: "user123",
+                email: "user@example.com",
+                isAdmin: false,
+                regDate: "05.07.2023",
+                modsCount: 1,
+                downloadsCount: 0,
+                likesCount: 0
+            }
+        ];
+
+        let modsDatabase = JSON.parse(localStorage.getItem('mods')) || [
+            {
+                id: 1,
+                name: "Драконы в игре",
+                author: "admin",
+                description: "Добавляет 5 новых видов драконов с уникальными способностями.",
+                filename: "dragons_mod.zip",
+                fileUrl: "#",
+                status: "approved",
+                isOfficial: true,
+                date: "15.07.2023",
+                downloads: 1245,
+                likes: 145,
+                userId: 1,
+                comments: [
+                    {id: 1, userId: 2, username: "user", text: "Отличный мод! Драконы просто невероятные!", date: "16.07.2023", likes: 0}
+                ]
+            },
+            {
+                id: 2,
+                name: "Магические шляпы",
+                author: "admin",
+                description: "30 новых магических шляп с уникальными эффектами.",
+                filename: "magic_hats.zip",
+                fileUrl: "#",
+                status: "approved",
+                isOfficial: true,
+                date: "10.07.2023",
+                downloads: 892,
+                likes: 92,
+                userId: 1,
+                comments: []
+            },
+            {
+                id: 3,
+                name: "Новые текстуры оружия",
+                author: "user",
+                description: "Полный ретекстур всех видов оружия в HD качестве.",
+                filename: "weapons_hd.zip",
+                fileUrl: "#",
+                status: "pending",
+                isOfficial: false,
+                date: "20.07.2023",
+                downloads: 0,
+                likes: 0,
+                userId: 2,
+                comments: []
+            }
+        ];
+
+        // Сохранение данных в localStorage
+        function saveData() {
+            localStorage.setItem('users', JSON.stringify(usersDatabase));
+            localStorage.setItem('mods', JSON.stringify(modsDatabase));
+        }
+
+        // Переключение вкладок авторизации
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+                
+                this.classList.add('active');
+                document.getElementById(`${this.dataset.tab}-form`).classList.add('active');
+            });
+        });
+        
+        // Показать поле для админ-кода
+        showAdminCodeBtn.addEventListener('click', () => {
+            adminCodeGroup.classList.add('show');
+            showAdminCodeBtn.style.display = 'none';
+        });
+        
+        // Открытие модального окна
+        loginBtn.addEventListener('click', () => {
+            document.querySelector('.auth-tab[data-tab="login"]').click();
+            authModal.style.display = 'flex';
+        });
+        
+        registerBtn.addEventListener('click', () => {
+            document.querySelector('.auth-tab[data-tab="register"]').click();
+            authModal.style.display = 'flex';
+            adminCodeGroup.classList.remove('show');
+            showAdminCodeBtn.style.display = 'block';
+        });
+        
+        // Закрытие модального окна
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) {
+                authModal.style.display = 'none';
+            }
+        });
+
+        // Переход на главную при клике на логотип
+        mainLogo.addEventListener('click', () => {
+            showTab('mods-tab');
+        });
+        
+        // Функции для работы с пользователями
+        function loginUser(username, password) {
+            return usersDatabase.find(u => u.username === username && u.password === password) || null;
+        }
+        
+        function registerUser(username, password, email, adminCode = "") {
+            if (usersDatabase.some(u => u.username === username)) {
+                return false;
+            }
+            
+            const isAdmin = (adminCode === ADMIN_CODE);
+            
+            const newUser = {
+                id: Date.now(),
+                username,
+                password,
+                email,
+                isAdmin,
+                regDate: new Date().toLocaleDateString(),
+                modsCount: 0,
+                downloadsCount: 0,
+                likesCount: 0
+            };
+            
+            usersDatabase.push(newUser);
+            saveData();
+            return newUser;
+        }
+        
+        function deleteUser(id) {
+            const index = usersDatabase.findIndex(u => u.id === id);
+            if (index !== -1) {
+                // Удаляем все моды этого пользователя
+                modsDatabase = modsDatabase.filter(m => m.userId !== id);
+                
+                // Удаляем пользователя
+                usersDatabase.splice(index, 1);
+                saveData();
+                return true;
+            }
+            return false;
+        }
+        
+        // Вход
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            
+            const user = loginUser(username, password);
+            if (user) {
+                currentUser = user;
+                updateUI();
+                authModal.style.display = 'none';
+                this.reset();
+                alert(`Добро пожаловать, ${user.username}!`);
+            } else {
+                alert('Неверные логин или пароль');
+            }
+        });
+        
+        // Регистрация
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+            const email = document.getElementById('register-email').value;
+            const adminCode = document.getElementById('admin-code').value;
+            
+            const newUser = registerUser(username, password, email, adminCode);
+            if (newUser) {
+                currentUser = newUser;
+                updateUI();
+                authModal.style.display = 'none';
+                this.reset();
+                adminCodeGroup.classList.remove('show');
+                showAdminCodeBtn.style.display = 'block';
+                
+                if (newUser.isAdmin) {
+                    alert('Регистрация успешна! Вы получили права администратора.');
+                } else {
+                    alert('Регистрация успешна! Теперь вы можете войти.');
+                }
+            } else {
+                alert('Пользователь с таким логином уже существует');
+            }
+        });
+        
+        // Выход
+        logoutBtn.addEventListener('click', () => {
+            currentUser = null;
+            updateUI();
+            alert('Вы успешно вышли из системы');
+        });
+        
+        // Переключение на управление пользователями
+        manageUsersBtn.addEventListener('click', () => {
+            usersManagement.style.display = 'block';
+            loadUsers();
+        });
+        
+        // Одобрить все моды
+        approveAllBtn.addEventListener('click', () => {
+            if (confirm('Вы уверены, что хотите одобрить все моды на проверке?')) {
+                modsDatabase.forEach(mod => {
+                    if (mod.status === 'pending') {
+                        mod.status = 'approved';
+                    }
+                });
+                saveData();
+                loadMods();
+                updateStats();
+                alert('Все моды успешно одобрены!');
+            }
+        });
+        
+        // Отклонить все моды
+        rejectAllBtn.addEventListener('click', () => {
+            if (confirm('Вы уверены, что хотите отклонить все моды на проверке?')) {
+                modsDatabase = modsDatabase.filter(mod => mod.status !== 'pending');
+                saveData();
+                loadMods();
+                updateStats();
+                alert('Все моды на проверке успешно отклонены!');
+            }
+        });
+        
+        // Создание официального мода
+        officialModsBtn.addEventListener('click', () => {
+            showTab('upload-tab');
+        });
+        
+        // Создание бэкапа
+        backupBtn.addEventListener('click', () => {
+            const backupData = {
+                users: usersDatabase,
+                mods: modsDatabase,
+                timestamp: new Date().toISOString()
+            };
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", `backup_${new Date().toLocaleDateString().replace(/\./g, '-')}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            alert('Резервная копия успешно создана и загружена!');
+        });
+        
+        // Восстановление бэкапа
+        restoreBtn.addEventListener('click', () => {
+            if (!backupFile.files.length) {
+                alert('Пожалуйста, выберите файл резервной копии');
+                return;
+            }
+            
+            const file = backupFile.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const backupData = JSON.parse(e.target.result);
+                    
+                    if (backupData.users && backupData.mods) {
+                        usersDatabase = backupData.users;
+                        modsDatabase = backupData.mods;
+                        saveData();
+                        updateUI();
+                        loadMods();
+                        updateStats();
+                        alert('Данные успешно восстановлены из резервной копии!');
+                    } else {
+                        alert('Неверный формат файла резервной копии');
+                    }
+                } catch (error) {
+                    alert('Ошибка при чтении файла: ' + error.message);
+                }
+            };
+            
+            reader.readAsText(file);
+        });
+        
+        // Обновление интерфейса в зависимости от авторизации
+        function updateUI() {
+            if (currentUser) {
+                loginBtn.style.display = 'none';
+                registerBtn.style.display = 'none';
+                userProfile.style.display = 'block';
+                usernameDisplay.textContent = currentUser.username;
+                
+                // Показываем админ-вкладку только для админов
+                document.querySelector('a[data-tab="admin-tab"]').style.display = 
+                    currentUser.isAdmin ? 'block' : 'none';
+                    
+                // Обновляем списки
+                loadMods();
+                updateStats();
+            } else {
+                loginBtn.style.display = 'inline-block';
+                registerBtn.style.display = 'inline-block';
+                userProfile.style.display = 'none';
+                document.querySelector('a[data-tab="admin-tab"]').style.display = 'none';
+            }
+        }
+        
+        // Переключение вкладок
+        function showTab(tabId) {
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            
+            // Находим соответствующую ссылку и активируем ее
+            const tabLink = document.querySelector(`.nav-link[data-tab="${tabId}"]`);
+            if (tabLink) tabLink.classList.add('active');
+            
+            document.getElementById(tabId).classList.add('active');
+            
+            // Скрываем управление пользователями при переключении вкладок
+            if (tabId !== 'admin-tab') {
+                usersManagement.style.display = 'none';
+            }
+            
+            // Обновляем статистику на админ-панели
+            if (tabId === 'admin-tab') {
+                updateStats();
+            }
+        }
+        
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                showTab(this.getAttribute('data-tab'));
+            });
+        });
+        
+        // Переход в профиль
+        usernameDisplay.addEventListener('click', function() {
+            if (currentUser) {
+                showProfile(currentUser.id);
+            }
+        });
+        
+        // Обработка загрузки файла
+        const fileUploadArea = document.getElementById('file-upload-area');
+        const fileInput = document.getElementById('mod-file');
+        const fileName = document.getElementById('file-name');
+        
+        fileUploadArea.addEventListener('click', () => fileInput.click());
+        
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                fileName.textContent = `Выбран файл: ${this.files[0].name}`;
+                fileUploadArea.style.borderColor = '#6c5ce7';
+            }
+        });
+        
+        // Drag and drop
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = '#6c5ce7';
+            fileUploadArea.style.backgroundColor = 'rgba(108, 92, 231, 0.1)';
+        });
+        
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.style.borderColor = fileInput.files.length ? '#6c5ce7' : '#ddd';
+            fileUploadArea.style.backgroundColor = '';
+        });
+        
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                fileName.textContent = `Выбран файл: ${e.dataTransfer.files[0].name}`;
+                fileUploadArea.style.borderColor = '#6c5ce7';
+            }
+            fileUploadArea.style.backgroundColor = '';
+        });
+        
+        // Отправка формы мода
+        document.getElementById('upload-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                alert('Для загрузки мода необходимо авторизоваться');
+                return;
+            }
+            
+            const modName = document.getElementById('mod-name').value;
+            const modDesc = document.getElementById('mod-desc').value;
+            const modFile = fileInput.files[0];
+            
+            if (!modFile || !modFile.name.endsWith('.zip')) {
+                alert('Пожалуйста, загрузите файл в формате .zip');
+                return;
+            }
+            
+            // Создаем Blob для скачивания
+            const fileBlob = new Blob([modFile], { type: 'application/zip' });
+            const fileUrl = URL.createObjectURL(fileBlob);
+            
+            // Определяем, является ли мод официальным (если загружает админ)
+            const isOfficial = currentUser.isAdmin;
+            
+            // Добавляем мод в базу данных
+            addNewMod({
+                id: Date.now(),
+                name: modName,
+                author: currentUser.username,
+                description: modDesc,
+                filename: modFile.name,
+                fileUrl: fileUrl,
+                status: isOfficial ? 'approved' : 'pending',
+                isOfficial: isOfficial,
+                date: new Date().toLocaleDateString(),
+                downloads: 0,
+                likes: 0,
+                userId: currentUser.id,
+                comments: []
+            });
+            
+            // Обновляем статистику пользователя
+            currentUser.modsCount++;
+            saveData();
+            
+            alert(`Мод успешно ${isOfficial ? 'опубликован как официальный' : 'отправлен на модерацию'}!`);
+            this.reset();
+            fileName.textContent = '';
+            fileUploadArea.style.borderColor = '#ddd';
+            
+            // Обновляем список модов
+            loadMods();
+            updateStats();
+        });
+        
+        // Функции для работы с модами
+        function getMods() {
+            return modsDatabase;
+        }
+        
+        function getModById(id) {
+            return modsDatabase.find(m => m.id === id);
+        }
+        
+        function addNewMod(mod) {
+            modsDatabase.push(mod);
+            saveData();
+        }
+        
+        function approveMod(id) {
+            const mod = modsDatabase.find(m => m.id === id);
+            if (mod) {
+                mod.status = "approved";
+                saveData();
+            }
+        }
+        
+        function rejectMod(id) {
+            modsDatabase = modsDatabase.filter(m => m.id !== id);
+            saveData();
+        }
+        
+        function deleteMod(id) {
+            modsDatabase = modsDatabase.filter(m => m.id !== id);
+            saveData();
+        }
+        
+        function downloadMod(id) {
+            const mod = modsDatabase.find(m => m.id === id);
+            if (mod) {
+                mod.downloads++;
+                
+                // Обновляем статистику пользователя
+                const user = usersDatabase.find(u => u.id === mod.userId);
+                if (user) user.downloadsCount++;
+                
+                saveData();
+                
+                // Имитация скачивания
+                const link = document.createElement('a');
+                link.href = mod.fileUrl;
+                link.download = mod.filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                alert(`Начинается загрузка: ${mod.filename}`);
+            }
+        }
+        
+        function likeMod(modId) {
+            const mod = modsDatabase.find(m => m.id === modId);
+            if (mod) {
+                if (!mod.likedBy) mod.likedBy = [];
+                
+                if (mod.likedBy.includes(currentUser.id)) {
+                    // Удаляем лайк
+                    const index = mod.likedBy.indexOf(currentUser.id);
+                    mod.likedBy.splice(index, 1);
+                    mod.likes--;
+                    
+                    // Обновляем статистику пользователя
+                    const user = usersDatabase.find(u => u.id === mod.userId);
+                    if (user) user.likesCount--;
+                } else {
+                    // Добавляем лайк
+                    mod.likedBy.push(currentUser.id);
+                    mod.likes++;
+                    
+                    // Обновляем статистику пользователя
+                    const user = usersDatabase.find(u => u.id === mod.userId);
+                    if (user) user.likesCount++;
+                }
+                
+                saveData();
+                return true;
+            }
+            return false;
+        }
+        
+        function addComment(modId, text) {
+            const mod = modsDatabase.find(m => m.id === modId);
+            if (mod) {
+                mod.comments.push({
+                    id: Date.now(),
+                    userId: currentUser.id,
+                    username: currentUser.username,
+                    text: text,
+                    date: new Date().toLocaleDateString(),
+                    likes: 0
+                });
+                saveData();
+                return true;
+            }
+            return false;
+        }
+        
+        // Функция для отображения мода
+        function renderModCard(mod) {
+            const isOwner = currentUser && (currentUser.id === mod.userId || currentUser.isAdmin);
+            const badge = mod.isOfficial ? 
+                `<span class="mod-badge badge-official"><i class="fas fa-crown"></i> Официальный</span>` : 
+                `<span class="mod-badge badge-community"><i class="fas fa-users"></i> Сообщество</span>`;
+            
+            return `
+                <div class="mod-card" data-id="${mod.id}">
+                    ${isOwner ? `<button class="delete-mod" title="Удалить мод"><i class="fas fa-trash"></i></button>` : ''}
+                    <div class="mod-preview">
+                        <i class="fas fa-${mod.status === 'approved' ? 'check' : 'clock'}"></i>
+                    </div>
+                    <div class="mod-content">
+                        <h3 class="mod-title">${mod.name} ${badge}</h3>
+                        <p class="mod-author">Автор: ${mod.author}</p>
+                        <p class="mod-description">${mod.description}</p>
+                        <div class="mod-meta">
+                            <span class="mod-status status-${mod.status}">
+                                <i class="fas fa-${mod.status === 'approved' ? 'check' : 'clock'}"></i>
+                                ${mod.status === 'approved' ? 'Одобрено' : 'На проверке'}
+                            </span>
+                            <span><i class="fas fa-calendar-alt"></i> ${mod.date}</span>
+                        </div>
+                        ${mod.status === 'approved' ? 
+                            `<a href="#" class="btn btn-primary download-btn" data-id="${mod.id}" style="margin-top: 10px; display: inline-block;">
+                                <i class="fas fa-download"></i> Скачать (${mod.downloads})
+                            </a>` : 
+                            currentUser && currentUser.isAdmin ? `
+                            <div class="admin-actions">
+                                <button class="btn btn-success approve-btn">
+                                    <i class="fas fa-check"></i> Одобрить
+                                </button>
+                                <button class="btn btn-danger reject-btn">
+                                    <i class="fas fa-times"></i> Отклонить
+                                </button>
+                            </div>` : ''
+                        }
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Загрузка модов
+        function loadMods() {
+            const officialModsContainer = document.getElementById('official-mods');
+            const communityModsContainer = document.getElementById('community-mods');
+            const pendingModsContainer = document.getElementById('pending-mods');
+            
+            officialModsContainer.innerHTML = '';
+            communityModsContainer.innerHTML = '';
+            pendingModsContainer.innerHTML = '';
+            
+            getMods().forEach(mod => {
+                if (mod.status === 'approved') {
+                    if (mod.isOfficial) {
+                        officialModsContainer.innerHTML += renderModCard(mod);
+                    } else {
+                        communityModsContainer.innerHTML += renderModCard(mod);
+                    }
+                } else if (currentUser && currentUser.isAdmin) {
+                    pendingModsContainer.innerHTML += renderModCard(mod);
+                }
+            });
+            
+            // Назначаем обработчики для кнопок
+            document.querySelectorAll('.approve-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modId = parseInt(this.closest('.mod-card').getAttribute('data-id'));
+                    approveMod(modId);
+                    loadMods();
+                    updateStats();
+                    alert('Мод одобрен и опубликован!');
+                });
+            });
+            
+            document.querySelectorAll('.reject-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modId = parseInt(this.closest('.mod-card').getAttribute('data-id'));
+                    rejectMod(modId);
+                    loadMods();
+                    updateStats();
+                    alert('Мод отклонен и удален!');
+                });
+            });
+            
+            document.querySelectorAll('.download-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const modId = parseInt(this.getAttribute('data-id'));
+                    downloadMod(modId);
+                    updateStats();
+                });
+            });
+            
+            document.querySelectorAll('.delete-mod').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const modId = parseInt(this.closest('.mod-card').getAttribute('data-id'));
+                    deleteMod(modId);
+                    loadMods();
+                    updateStats();
+                    alert('Мод успешно удален!');
+                });
+            });
+            
+            // Обработка клика на карточку мода
+            document.querySelectorAll('.mod-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // Игнорируем клики по кнопкам
+                    if (e.target.closest('button') || e.target.closest('a')) return;
+                    
+                    const modId = parseInt(this.getAttribute('data-id'));
+                    showModPage(modId);
+                });
+            });
+        }
+        
+        // Загрузка пользователей
+        function loadUsers() {
+            usersTableBody.innerHTML = '';
+            
+            usersDatabase.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td><span class="user-role role-${user.isAdmin ? 'admin' : 'user'}">${user.isAdmin ? 'Админ' : 'Пользователь'}</span></td>
+                    <td>${user.regDate}</td>
+                    <td class="user-actions">
+                        ${user.id !== 1 ? `
+                        <button class="btn btn-danger btn-sm delete-user-btn" data-id="${user.id}">
+                            <i class="fas fa-trash"></i> Удалить
+                        </button>` : ''}
+                    </td>
+                `;
+                usersTableBody.appendChild(tr);
+            });
+            
+            // Назначаем обработчики удаления
+            document.querySelectorAll('.delete-user-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = parseInt(this.getAttribute('data-id'));
+                    if (confirm(`Вы уверены, что хотите удалить пользователя #${userId}? Все его моды также будут удалены!`)) {
+                        if (deleteUser(userId)) {
+                            loadUsers();
+                            updateStats();
+                            alert('Пользователь успешно удален!');
+                        }
+                    }
+                });
+            });
+        }
+        
+        // Обновление статистики
+        function updateStats() {
+            totalUsersEl.textContent = usersDatabase.length;
+            totalModsEl.textContent = modsDatabase.length;
+            
+            const pendingMods = modsDatabase.filter(m => m.status === 'pending').length;
+            pendingModsCountEl.textContent = pendingMods;
+            
+            const totalDownloads = modsDatabase.reduce((sum, mod) => sum + mod.downloads, 0);
+            downloadsCountEl.textContent = totalDownloads;
+        }
+        
+        // Показать страницу мода
+        function showModPage(modId) {
+            const mod = getModById(modId);
+            if (!mod) return;
+            
+            const modPage = document.getElementById('mod-page-tab');
+            modPage.innerHTML = `
+                <h1 class="section-title">${mod.name}</h1>
+                
+                <div class="mod-header">
+                    <div class="mod-header-image">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="mod-header-info">
+                        <div class="mod-author">Автор: ${mod.author}</div>
+                        <p>${mod.description}</p>
+                        
+                        <div class="mod-stats">
+                            <div class="mod-stat">
+                                <div class="mod-stat-value">${mod.downloads}</div>
+                                <div class="mod-stat-label">Загрузок</div>
+                            </div>
+                            <div class="mod-stat">
+                                <div class="mod-stat-value">${mod.likes}</div>
+                                <div class="mod-stat-label">Лайков</div>
+                            </div>
+                            <div class="mod-stat">
+                                <div class="mod-stat-value">${mod.comments.length}</div>
+                                <div class="mod-stat-label">Комментариев</div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary download-btn" data-id="${mod.id}">
+                            <i class="fas fa-download"></i> Скачать
+                        </button>
+                        
+                        <button class="btn ${mod.likedBy && mod.likedBy.includes(currentUser?.id) ? 'btn-danger' : 'btn-secondary'} like-btn" id="like-mod-btn" data-id="${mod.id}">
+                            <i class="fas fa-heart"></i> ${mod.likedBy && mod.likedBy.includes(currentUser?.id) ? 'Убрать лайк' : 'Лайк'}
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="comments-section">
+                    <h3><i class="fas fa-comments"></i> Комментарии</h3>
+                    
+                    ${currentUser ? `
+                    <div class="comment-form">
+                        <div class="form-group">
+                            <textarea id="new-comment-text" class="form-control" rows="3" placeholder="Напишите ваш комментарий..."></textarea>
+                        </div>
+                        <button class="btn btn-primary" id="add-comment-btn" data-id="${mod.id}">
+                            <i class="fas fa-paper-plane"></i> Отправить
+                        </button>
+                    </div>
+                    ` : '<p>Войдите, чтобы оставлять комментарии</p>'}
+                    
+                    <div id="comments-list">
+                        ${mod.comments.map(comment => `
+                            <div class="comment">
+                                <div class="comment-header">
+                                    <div class="comment-author">${comment.username}</div>
+                                    <div class="comment-date">${comment.date}</div>
+                                </div>
+                                <div class="comment-content">${comment.text}</div>
+                                <button class="like-btn">
+                                    <i class="fas fa-thumbs-up"></i> ${comment.likes}
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            // Назначаем обработчики для страницы мода
+            document.querySelector('.download-btn')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                downloadMod(modId);
+                updateStats();
+            });
+            
+            document.getElementById('like-mod-btn')?.addEventListener('click', function() {
+                if (!currentUser) {
+                    alert('Войдите, чтобы ставить лайки');
+                    return;
+                }
+                
+                likeMod(modId);
+                showModPage(modId); // Перезагружаем страницу
+            });
+            
+            document.getElementById('add-comment-btn')?.addEventListener('click', function() {
+                const text = document.getElementById('new-comment-text').value.trim();
+                if (!text) {
+                    alert('Введите текст комментария');
+                    return;
+                }
+                
+                addComment(modId, text);
+                showModPage(modId); // Перезагружаем страницу
+            });
+            
+            showTab('mod-page-tab');
+        }
+        
+        // Показать профиль пользователя
+        function showProfile(userId) {
+            const user = usersDatabase.find(u => u.id === userId);
+            if (!user) return;
+            
+            const profilePage = document.getElementById('profile-tab');
+            profilePage.innerHTML = `
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        ${user.username.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                        <h1 class="section-title">${user.username}</h1>
+                        <p>Зарегистрирован: ${user.regDate}</p>
+                        <p>${user.isAdmin ? '<span class="role-admin">Администратор</span>' : '<span class="role-user">Пользователь</span>'}</p>
+                    </div>
+                </div>
+                
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">${user.modsCount}</div>
+                        <div class="profile-stat-label">Модов</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">${user.downloadsCount}</div>
+                        <div class="profile-stat-label">Загрузок</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">${user.likesCount}</div>
+                        <div class="profile-stat-label">Лайков</div>
+                    </div>
+                </div>
+                
+                <h2 class="mods-section-title"><i class="fas fa-box-open"></i> Моды пользователя</h2>
+                <div class="mods-grid" id="user-mods">
+                    ${modsDatabase
+                        .filter(m => m.userId === userId)
+                        .map(mod => renderModCard(mod))
+                        .join('') || '<p>Пользователь еще не загрузил моды</p>'}
+                </div>
+            `;
+            
+            // Назначаем обработчики для модов пользователя
+            document.querySelectorAll('.mod-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (e.target.closest('button') || e.target.closest('a')) return;
+                    
+                    const modId = parseInt(this.getAttribute('data-id'));
+                    showModPage(modId);
+                });
+            });
+            
+            showTab('profile-tab');
+        }
+        
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUI();
+            loadMods();
+            updateStats();
+            
+            // Проверяем наличие параметров в URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const modId = urlParams.get('mod');
+            const userId = urlParams.get('user');
+            
+            if (modId) {
+                showModPage(parseInt(modId));
+            } else if (userId) {
+                showProfile(parseInt(userId));
+            }
+        });
+    </script>
+</body>
+</html>

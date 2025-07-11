@@ -1,0 +1,209 @@
+/* Новые стили для админ-панели */
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--primary);
+    margin: 10px 0;
+}
+
+.stat-label {
+    color: #a29bfe;
+    font-size: 1rem;
+}
+
+.admin-tools {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.tool-card {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tool-card h3 {
+    color: white;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.tool-card h3 i {
+    margin-right: 10px;
+    color: var(--secondary);
+}
+
+.tool-card p {
+    color: #ddd;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.user-table th, .user-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-table th {
+    background: rgba(108, 92, 231, 0.2);
+    color: var(--secondary);
+    font-weight: 600;
+}
+
+.user-table tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.user-role {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.role-admin {
+    background: rgba(108, 92, 231, 0.2);
+    color: var(--primary);
+}
+
+.role-user {
+    background: rgba(0, 184, 148, 0.2);
+    color: var(--success);
+}
+
+.user-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+}
+
+.mods-section-title {
+    color: white;
+    margin: 2rem 0 1rem;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary);
+    display: flex;
+    align-items: center;
+}
+
+.mods-section-title i {
+    margin-right: 10px;
+    color: var(--secondary);
+}
+
+.bulk-actions {
+    display: flex;
+    gap: 10px;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+}
+
+.checkbox-container {
+    display: block;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.checkbox-container input:checked ~ .checkmark {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.checkbox-container .checkmark:after {
+    left: 7px;
+    top: 3px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.mod-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.badge-official {
+    background: rgba(108, 92, 231, 0.2);
+    color: var(--primary);
+}
+
+.badge-community {
+    background: rgba(0, 184, 148, 0.2);
+    color: var(--success);
+}
